@@ -121,9 +121,10 @@ launcher. Posle svake nadogradnje ponovo pokrenite `install.sh`.
 Bez otvaranja pregledača, direktno se može proveriti da li SmartBox sada vidi MUP:
 
 ```bash
-JAR=$(ls /opt/smartbox/smartbox-*.jar | head -1)
-java -cp /usr/share/smartbox-licna-karta/smartbox-mup-patch.jar:$JAR \
-     com.itsinbox.smartbox.SmartBox ACTION GET_VENDORS
+JAVA=$(update-alternatives --list java | grep java-21-openjdk | head -1)
+JAR=$(printf '%s\n' /opt/smartbox/smartbox-*.jar | sort -V | tail -1)
+"$JAVA" -cp "/usr/share/smartbox-licna-karta/smartbox-mup-patch.jar:$JAR" \
+        com.itsinbox.smartbox.SmartBox ACTION GET_VENDORS
 ```
 
 Očekivani izlaz:
@@ -134,6 +135,17 @@ Očekivani izlaz:
 
 `WyJNVVAiXQ==` je Base64 za `["MUP"]`. Ako dobijete `W10=`, to je `[]` i patch se ne
 primenjuje.
+
+Dve zamke, zbog kojih komanda namerno izgleda ovako:
+
+> **Mora Java 21**, jer je smartbox JAR class file verzije 65. Ako vam je podrazumevani `java`
+> stariji (na primer 17, kroz `asdf` ili `update-alternatives`), dobićete
+> `UnsupportedClassVersionError ... only recognizes class file versions up to 61.0`, iako je
+> paket sasvim ispravno instaliran.
+
+> **`printf` i glob umesto `ls`.** Uz `alias ls='ls --color=auto'` `ls` ume da ubaci ANSI
+> kodove i unutar `$(...)`, pa putanja postane neupotrebljiva i dobijete
+> `ClassNotFoundException`. Iz istog razloga i launcher u paketu koristi glob.
 
 Da li kartica uopšte radi, nezavisno od SmartBox-a:
 

@@ -45,11 +45,15 @@ To je vrlo korisno za dijagnostiku, jer se ceo korak može pozvati direktno, bez
 pregledača:
 
 ```bash
-java -jar /opt/smartbox/smartbox-2.0.0.jar ACTION GET_VENDORS
+/usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar /opt/smartbox/smartbox-2.0.0.jar ACTION GET_VENDORS
 ```
 
 Na nezakrpljenoj instalaciji vraća `######VENDOR_LIST######W10=`, a `W10=` je Base64 za
 `[]`.
+
+> Java se navodi punom putanjom jer je JAR class file verzije **65 (Java 21)**. Sa starijim
+> `java` iz `PATH` dobija se `UnsupportedClassVersionError`, što lako odvuče dijagnostiku u
+> pogrešnom smeru.
 
 Sam izbor vendora radi `SmartCardUtil.getInstalledMiddleware()`, koja filtrira
 `CardVendor` vrednosti kroz `SmartCard.isMiddlewareInstalled()`.
@@ -294,6 +298,6 @@ pcsc_scan -c
 opensc-tool -l -a
 pkcs11-tool --module /usr/lib/libsrb-id-pkcs11.so -L -O
 
-# ponašanje same aplikacije
-java -jar /opt/smartbox/smartbox-2.0.0.jar ACTION GET_VENDORS
+# ponašanje same aplikacije (obavezno Java 21, JAR je class file v65)
+/usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar /opt/smartbox/smartbox-2.0.0.jar ACTION GET_VENDORS
 ```
