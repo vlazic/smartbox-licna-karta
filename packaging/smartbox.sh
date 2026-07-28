@@ -34,8 +34,11 @@ if [ -z "$JAVA_BIN" ]; then
 fi
 
 # Zvanicni JAR, bez oslanjanja na tacnu verziju u imenu.
-SMARTBOX_JAR=$(ls -1 /opt/smartbox/smartbox-*.jar 2>/dev/null | sort -V | tail -1)
-if [ -z "$SMARTBOX_JAR" ]; then
+# Koristi se glob i ugradjeni printf umesto ls, da na rezultat ne bi uticali
+# aliasi ni bojenje izlaza. Ako glob nema pogodak, ostaje doslovan obrazac,
+# pa ga hvata provera postojanja ispod.
+SMARTBOX_JAR=$(printf '%s\n' /opt/smartbox/smartbox-*.jar | sort -V | tail -1)
+if [ ! -e "$SMARTBOX_JAR" ]; then
     echo 'Greska: nije pronadjen /opt/smartbox/smartbox-*.jar. Da li je paket smartbox instaliran?' >&2
     exit 1
 fi

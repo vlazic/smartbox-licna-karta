@@ -12,9 +12,14 @@ case "$1" in
 
         # Ako je neko ranije ručno zakrpio zvanični JAR, ta izmena je sada
         # suvišna i samo pravi zabunu. Ne diramo je automatski, samo javimo.
+        #
+        # Javljamo isključivo ako se JAR stvarno razlikuje od sačuvanog originala.
+        # Postojanje .orig fajla samo po sebi ne znači da je JAR i dalje zakrpljen.
         for orig in /opt/smartbox/smartbox-*.jar.orig; do
             [ -e "$orig" ] || continue
             jar=${orig%.orig}
+            [ -e "$jar" ] || continue
+            cmp -s "$jar" "$orig" && continue
             echo ""
             echo "NAPOMENA: pronađen je $orig"
             echo "  Izgleda da je zvanični JAR ranije ručno zakrpljen. To više nije potrebno."
