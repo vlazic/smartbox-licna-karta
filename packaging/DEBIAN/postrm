@@ -1,0 +1,17 @@
+#!/bin/sh
+# Vraća zvaničnu smartbox.sh na mesto pri uklanjanju paketa.
+#
+# Namerno se ne izvršava na "upgrade": tada preusmerenje mora da ostane.
+set -e
+
+DIVERT_FROM=/opt/smartbox/smartbox.sh
+DIVERT_TO=/opt/smartbox/smartbox.sh.distrib
+
+case "$1" in
+    remove|purge|abort-install|abort-upgrade|disappear)
+        dpkg-divert --package smartbox-licna-karta --remove --rename \
+            --divert "$DIVERT_TO" "$DIVERT_FROM"
+        ;;
+esac
+
+exit 0

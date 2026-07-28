@@ -1,0 +1,20 @@
+Package: smartbox-licna-karta
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: smartbox, pcscd
+Recommends: pcsc-tools, opensc
+Maintainer: Vladimir Lazić <contact@vlazic.com>
+Homepage: https://github.com/vlazic/smartbox-licna-karta
+Description: Podrška za ličnu kartu (MUP) u SmartBox aplikaciji na Linuxu
+ Zvanična SmartBox aplikacija Poreske uprave na Linuxu ne prepoznaje ličnu
+ kartu, jer u sebi ima upisanu isključivo Windows putanju do MUP middleware
+ biblioteke. Posledica je prazna lista sertifikacionih tela i nemogućnost
+ prijave na portal ePorezi.
+ .
+ Ovaj paket dodaje podršku tako što ispred zvaničnog JAR-a na classpath
+ postavlja jednu zamensku klasu koja pokazuje na otvoreni PKCS#11 modul
+ srb-id-pkcs11. Zvanični JAR se ne menja niti redistribuira.
+ .
+ Paket nije zvaničan i nije povezan sa Poreskom upravom Republike Srbije.

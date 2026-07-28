@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        chmod 0755 /opt/smartbox/smartbox.sh 2>/dev/null || true
+
+        # Čitač kartice ne radi bez pcscd.
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl enable --now pcscd.socket >/dev/null 2>&1 || true
+        fi
+
+        # Ako je neko ranije ručno zakrpio zvanični JAR, ta izmena je sada
+        # suvišna i samo pravi zabunu. Ne diramo je automatski, samo javimo.
+        for orig in /opt/smartbox/smartbox-*.jar.orig; do
+            [ -e "$orig" ] || continue
+            jar=${orig%.orig}
+            echo ""
+            echo "NAPOMENA: pronađen je $orig"
+            echo "  Izgleda da je zvanični JAR ranije ručno zakrpljen. To više nije potrebno."
+            echo "  Vratite original ovako:"
+            echo "    sudo cp \"$orig\" \"$jar\""
+            if command -v apt-mark >/dev/null 2>&1 && apt-mark showhold 2>/dev/null | grep -qx smartbox; then
+                echo "  i skinite zadršku sa paketa:"
+                echo "    sudo apt-mark unhold smartbox"
+            fi
+            echo ""
+        done
+
+        echo "smartbox-licna-karta je instaliran."
+        echo "Pokrenite 'smartbox', pa se prijavite na https://eporezi.purs.gov.rs"
+        ;;
+esac
+
+exit 0

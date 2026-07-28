@@ -1,0 +1,20 @@
+#!/bin/sh
+# Preusmerava zvaničnu /opt/smartbox/smartbox.sh na .distrib, da bismo na to
+# mesto mogli da instaliramo svoju verziju launchera.
+#
+# dpkg-divert je zvanični Debian mehanizam za ovo: nadogradnja paketa smartbox
+# će i dalje pisati svoju skriptu, ali će ona završiti u .distrib, pa naš
+# launcher ostaje na snazi i posle "apt upgrade".
+set -e
+
+DIVERT_FROM=/opt/smartbox/smartbox.sh
+DIVERT_TO=/opt/smartbox/smartbox.sh.distrib
+
+case "$1" in
+    install|upgrade)
+        dpkg-divert --package smartbox-licna-karta --add --rename \
+            --divert "$DIVERT_TO" "$DIVERT_FROM"
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,8 @@
+# Podesavanja za smartbox-licna-karta.
+#
+# SMARTBOX_MUP_LIBRARY: putanja do PKCS#11 modula za licnu kartu.
+# Ostavite zakomentarisano da bi se koristio modul isporucen uz paket
+# (/usr/lib/libsrb-id-pkcs11.so). Odkomentarisite ako koristite svoju verziju,
+# na primer noviju ili samostalno kompajliranu.
+#
+#SMARTBOX_MUP_LIBRARY=/usr/local/lib/libsrb-id-pkcs11.so
