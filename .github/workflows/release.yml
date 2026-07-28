@@ -1,0 +1,56 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Sastavi .deb
+        run: ./build-deb.sh
+
+      - name: Provera da patch JAR sadrži samo našu klasu
+        run: |
+          entries=$(unzip -Z1 build/smartbox-mup-patch.jar | grep -c '\.class$')
+          if [ "$entries" -ne 1 ]; then
+            echo "GREŠKA: očekivana tačno 1 klasa, pronađeno $entries" >&2
+            unzip -Z1 build/smartbox-mup-patch.jar >&2
+            exit 1
+          fi
+          unzip -Z1 build/smartbox-mup-patch.jar | grep -qx 'com/itsinbox/pkcs11/sc/MUPSmartCard.class'
+
+      - name: Provera da .deb sadrži očekivane putanje
+        run: |
+          dpkg-deb --contents build/*.deb
+          for path in ./opt/smartbox/smartbox.sh \
+                      ./usr/lib/libsrb-id-pkcs11.so \
+                      ./usr/share/smartbox-licna-karta/smartbox-mup-patch.jar; do
+            dpkg-deb --contents build/*.deb | grep -q " $path\$" \
+              || { echo "GREŠKA: nedostaje $path" >&2; exit 1; }
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: build/*.deb
+
+      - name: Objavi release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.deb
+          generate_release_notes: true
